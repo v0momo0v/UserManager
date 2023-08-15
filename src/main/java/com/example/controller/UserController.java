@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.contant.UserContant.ADMIN_ROLE;
+import static com.example.contant.UserContant.LOGIN_STATE;
 
 @RestController
 @RequestMapping("/user")
@@ -45,7 +49,11 @@ public class UserController {
         return userService.userLogin(userAccount, userPassword,request);
     }
     @GetMapping("/search")
-    public List<User> searchUser(String username){
+    public List<User> searchUser(String username, HttpServletRequest request){
+        User user = (User) request.getSession().getAttribute(LOGIN_STATE);
+        if(user==null||user.getUserRole()!=ADMIN_ROLE){
+            return new ArrayList<>();
+        }
         QueryWrapper<User> queryWrapper=new QueryWrapper<>();
         if(StringUtils.isNotBlank(username)){
             queryWrapper.like("username",username);
