@@ -99,16 +99,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return null;
         }
         //用户脱敏
-        User newUser=new User();
-        newUser.setId(user.getId());
-        newUser.setUsername(user.getUsername());
-        newUser.setUserAccount(user.getUserAccount());
-        newUser.setAvatarUrl(user.getAvatarUrl());
-        newUser.setGender(user.getGender());
-        newUser.setEmail(user.getEmail());
-        newUser.setUserStatus(user.getUserStatus());
+        User newUser = getHandleUser(user);
         //记录登录态
         request.getSession().setAttribute(LOGIN_STATE,newUser);
+        return newUser;
+    }
+
+    /**
+     * 用户脱敏
+     * @param originUser
+     * @return
+     */
+    @Override
+    public User getHandleUser(User originUser){
+        if(originUser==null){
+            return null;
+        }
+        User newUser=new User();
+        newUser.setId(originUser.getId());
+        newUser.setUsername(originUser.getUsername());
+        newUser.setUserAccount(originUser.getUserAccount());
+        newUser.setAvatarUrl(originUser.getAvatarUrl());
+        newUser.setUserRole(originUser.getUserRole());
+        newUser.setGender(originUser.getGender());
+        newUser.setEmail(originUser.getEmail());
+        newUser.setUserStatus(originUser.getUserStatus());
         return newUser;
     }
 }

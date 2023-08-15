@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.contant.UserContant.ADMIN_ROLE;
 import static com.example.contant.UserContant.LOGIN_STATE;
@@ -50,21 +51,35 @@ public class UserController {
     }
     @GetMapping("/search")
     public List<User> searchUser(String username, HttpServletRequest request){
-        User user = (User) request.getSession().getAttribute(LOGIN_STATE);
-        if(user==null||user.getUserRole()!=ADMIN_ROLE){
+        if(!isAdmin(request)){
             return new ArrayList<>();
         }
         QueryWrapper<User> queryWrapper=new QueryWrapper<>();
         if(StringUtils.isNotBlank(username)){
             queryWrapper.like("username",username);
         }
-        return userService.list(queryWrapper);
+        List<User> userList = userService.list(queryWrapper);
+        List<User> list = userList.stream().map(user -> userService.getHandleUser(user)).collect(Collectors.toList());
+        return list;
     }
     @PostMapping("/delete")
-    public boolean deleteUser(long id){
+    public boolean deleteUser(long id,HttpServletRequest request){
+        if(!isAdmin(request)){
+            return false;
+        }
         if(id<=0){
             return false;
         }
         return userService.removeById(id);
+    }
+
+    /**
+     * 是否为管理员
+     * @param request
+     * @return
+     */
+    private boolean isAdmin(HttpServletRequest request){
+        User user = (User) request.getSession().getAttribute(LOGIN_STATE);
+        return user != null && user.getUserRole() == ADMIN_ROLE;
     }
 }
