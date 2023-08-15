@@ -12,7 +12,10 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
+.mvn
+.idea
+HELP.md
+mvnw.cmd
 ### IntelliJ IDEA ###
 .idea
 *.iws
